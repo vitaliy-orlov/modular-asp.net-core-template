@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.CodeAnalysis;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Http;
+using Core;
+using Microsoft.AspNetCore.Routing;
 
 namespace Host
 {
@@ -37,30 +31,8 @@ namespace Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string path = Configuration.GetValue<string>(Extensions.ModuleLoader.CONFIG_MODULES_PATH);
-
-            // Load assemblies
-            Extensions.ModuleLoader.LoadAssemblies(path);
-
-            // Add custom locations for searching Views in modules
-            services.Configure<RazorViewEngineOptions>(options =>
-            {
-                options.AreaViewLocationFormats.Add("{2}/Views/{1}/{0}.cshtml");
-                options.AreaViewLocationFormats.Add("{2}/Views/Shared/{0}.cshtml");
-            });
-
-            var mvc = services.AddMvc();
-
-            // Load each module to MVC service
-            foreach (var module in Extensions.ModuleLoader.ModulesList)
-            {
-                module.InitServices(services, Configuration);
-
-                mvc.AddApplicationPart(module.Assembly).AddRazorOptions(o => {
-                    o.AdditionalCompilationReferences.Add(MetadataReference.CreateFromFile(module.Assembly.Location));
-                    o.FileProviders.Add(new EmbeddedFileProvider(module.Assembly, module.Assembly.GetName().Name.Replace("." + module.AreaName, "")));
-                });
-            }
+            // Load assemblies by AddMvcModules
+            services.AddMvc().AddMvcModules(services, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,28 +52,15 @@ namespace Host
             }
 
             app.UseStaticFiles();
-
+            
             // Add modules assemblies for static files serving
-            foreach (var module in Extensions.ModuleLoader.ModulesList)
-            {
-                module.InitConfigs(app, env, loggerFactory, Configuration);
-
-                app.UseStaticFiles(new StaticFileOptions()
-                {
-                    FileProvider = new EmbeddedFileProvider(module.Assembly, module.Assembly.GetName().Name + ".wwwroot"),
-                    RequestPath = new PathString("/" + module.AreaName)
-                });
-            }
+            app.UseMvcModulesStaticFiles(env, loggerFactory, Configuration);
 
             app.UseMvc(routes =>
             {
-                // Special route for handling Area request
-                routes.MapRoute(
-                    name: "areaRoute",
-                    template: "{area:exists}/{controller=Home}/{action=Index}");
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                // Add route for area handling
+                routes.UseMvcModulesRoute();
+                routes.MapRoute(name: "default", template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

@@ -34,7 +34,7 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
 
-                    @foreach (var module in Host.Extensions.ModuleLoader.ModulesList)
+                    @foreach (var module in Core.CoreMvcBuilderExtensions.ModulesList)
                     {
                         <li role="presentation" class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
