@@ -54,7 +54,7 @@ namespace Host
             // Load each module to MVC service
             foreach (var module in Extensions.ModuleLoader.ModulesList)
             {
-                module.InitServices(services);
+                module.InitServices(services, Configuration);
 
                 mvc.AddApplicationPart(module.Assembly).AddRazorOptions(o => {
                     o.AdditionalCompilationReferences.Add(MetadataReference.CreateFromFile(module.Assembly.Location));
@@ -84,6 +84,8 @@ namespace Host
             // Add modules assemblies for static files serving
             foreach (var module in Extensions.ModuleLoader.ModulesList)
             {
+                module.InitConfigs(app, env, loggerFactory, Configuration);
+
                 app.UseStaticFiles(new StaticFileOptions()
                 {
                     FileProvider = new EmbeddedFileProvider(module.Assembly, module.Assembly.GetName().Name + ".wwwroot"),

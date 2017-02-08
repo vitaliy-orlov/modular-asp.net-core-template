@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace Module.Account
 {
@@ -23,12 +24,12 @@ namespace Module.Account
             _info = assembly;
         }
 
-        public void InitServices(IServiceCollection services)
+        public void InitServices(IServiceCollection services, IConfigurationRoot configuration)
         {
 
         }
 
-        public void InitConfigs(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void InitConfigs(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationRoot configuration)
         {
             
         }

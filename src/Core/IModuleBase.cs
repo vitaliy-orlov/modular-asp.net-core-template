@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace Core
 {
@@ -32,13 +33,13 @@ namespace Core
         /// Add module services to the container.
         /// </summary>
         /// <param name="services"></param>
-        void InitServices(IServiceCollection services);
+        void InitServices(IServiceCollection services, IConfigurationRoot configuration);
         /// <summary>
         /// Configure the HTTP request pipeline by module.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="loggerFactory"></param>
-        void InitConfigs(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory);
+        void InitConfigs(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationRoot configuration);
     }
 }
