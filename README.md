@@ -45,7 +45,7 @@ P.S. For \*nix systems actions algorithm similar, only with the use of util *dot
 ## The main points for development
 ### Project Host
 
-Main feature of the project *Host* is the presence of a class *ModuleLoader*, which loads the assembly of each module of the specified folder, and keeps a list of the type *IModuleBase* interfaces. *Startup* class has the following changes:
+Main feature of the project *Core* is the presence of a class *CoreMvcBuilderExtensions*, which loads the assembly of each module of the specified folder, and keeps a list of the type *IModuleBase* interfaces. *Startup* class of the project *Host* has the following changes:
 
 * Method **ConfigureServices**:
 ```cs
