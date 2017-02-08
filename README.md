@@ -54,30 +54,8 @@ Main feature of the project *Host* is the presence of a class *ModuleLoader*, wh
 
 public void ConfigureServices(IServiceCollection services)
 {
-    string path = Configuration.GetValue<string>(Extensions.ModuleLoader.CONFIG_MODULES_PATH);
-
-    // Load assemblies
-    Extensions.ModuleLoader.LoadAssemblies(path);
-
-    // Add custom locations for searching Views in modules
-    services.Configure<RazorViewEngineOptions>(options =>
-    {
-        options.AreaViewLocationFormats.Add("{2}/Views/{1}/{0}.cshtml");
-        options.AreaViewLocationFormats.Add("{2}/Views/Shared/{0}.cshtml");
-    });
-
-    var mvc = services.AddMvc();
-
-    // Load each module to MVC service
-    foreach (var module in Extensions.ModuleLoader.ModulesList)
-    {
-        module.InitServices(services);
-
-        mvc.AddApplicationPart(module.Assembly).AddRazorOptions(o => {
-            o.AdditionalCompilationReferences.Add(MetadataReference.CreateFromFile(module.Assembly.Location));
-            o.FileProviders.Add(new EmbeddedFileProvider(module.Assembly, module.Assembly.GetName().Name.Replace("." + module.AreaName, "")));
-        });
-    }
+    // Load assemblies by AddMvcModules
+    services.AddMvc().AddMvcModules(services, Configuration);
 }
 
 ...
@@ -108,24 +86,13 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
     app.UseStaticFiles();
 
     // Add modules assemblies for static files serving
-    foreach (var module in Extensions.ModuleLoader.ModulesList)
-    {
-        app.UseStaticFiles(new StaticFileOptions()
-        {
-            FileProvider = new EmbeddedFileProvider(module.Assembly, module.Assembly.GetName().Name + ".wwwroot"),
-            RequestPath = new PathString("/" + module.AreaName)
-        });
-    }
+    app.UseMvcModulesStaticFiles(env, loggerFactory, Configuration);
 
     app.UseMvc(routes =>
     {
-        // Special route for handling Area request
-        routes.MapRoute(
-            name: "areaRoute",
-            template: "{area:exists}/{controller=Home}/{action=Index}");
-        routes.MapRoute(
-            name: "default",
-            template: "{controller=Home}/{action=Index}/{id?}");
+        // Add route for area handling
+        routes.UseMvcModulesRoute();
+        routes.MapRoute(name: "default", template: "{controller=Home}/{action=Index}/{id?}");
     });
 }
 
@@ -138,7 +105,7 @@ And special attention should be paid to the file *\_Layout.cshtml*, which shows 
 ```cs
 ...
 
-@foreach (var module in Host.Extensions.ModuleLoader.ModulesList)
+@foreach (var module in Core.CoreMvcBuilderExtensions.ModulesList)
 {
     <li role="presentation" class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
