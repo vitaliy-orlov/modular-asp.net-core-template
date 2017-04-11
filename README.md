@@ -23,8 +23,7 @@ ModuleName/
 │   ├── img
 |   |   └── ...
 |   └── ...
-├── ModuleInfo.cs
-└── project.json
+└── ModuleInfo.cs
 ```
 
 ## Installing the template
@@ -105,19 +104,29 @@ And special attention should be paid to the file *\_Layout.cshtml*, which shows 
 ```cs
 ...
 
-@foreach (var module in Core.CoreMvcBuilderExtensions.ModulesList)
+@foreach (var panel in CoreMvcBuilderExtensions.ModulesList.Where(x => x.Features.Get<ISideBarPanelFeature>() != null).Select(x => x.Features.Get<ISideBarPanelFeature>()))
 {
-    <li role="presentation" class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-            @module.MainTabTitle <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            @foreach (var item in module.Controllers)
-            {
-                <li><a href="@Url.Action("Index", item.controller, new { Area = item.area })">@item.title</a></li>
-            }
-        </ul>
-    </li>
+    @if (panel.SubMenu?.Count > 0)
+    {
+        <li id="@panel.Id" class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#@panel.Id" role="button" aria-haspopup="true" aria-expanded="false">
+                @panel.Title
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                @foreach (var sub in panel.SubMenu)
+                {
+                    <li id="@sub.Id-sub"><a asp-action="@sub.Action" asp-controller="@sub.Controller" asp-area="@sub.Area">@sub.Title</a></li>
+                }
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li>
+            <a class="nav-link" href="@panel.Url"><i class="fa @panel.FAIcon"></i>@panel.Title</a>
+        </li>
+    }
 }
 
 ...
@@ -129,10 +138,10 @@ When you create a new module, it is necessary to observe the following rules:
 * The module should be dependent on the project *Core*
 * The module must implement the interface *IModuleBase*
 * Each controller must have the attribute *Area* with the same value
-* To specify the name of the controller to display the name on the navigation bar, use the attribute *MenuTitle*
+* To specify the name of the controller to display the name on the navigation bar, use the *Features* property.
 * The attribute value *Area* and the last word in the name of the project should be the same. For example, if your module is called *Product*, then each controller must have *Area* with a value of *Product*. If your project is called *My.Modular.App.Module.Product*, the *Area* should be set to *Product*
 * The module must have a constructor that takes a single parameter of type Assembly
-* The file **project.json** must have the following entry: ```"buildOptions": { "embed": [ "Views/**", "wwwroot/**" ] }```
+* The file ***.csprof** must have the following entry: ```<ItemGroup><EmbeddedResource Include="Views\**;wwwroot\**" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" /></ItemGroup>```
 
 ### StaticResourcePathConverterTagHelper 
 
