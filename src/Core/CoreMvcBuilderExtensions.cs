@@ -59,17 +59,15 @@ namespace Core
 
                 List<ControllerInfo> list = new List<ControllerInfo>();
                 AreaAttribute area;
-                MenuTitleAttribute sub;
 
                 foreach (Type controller in moduleAssembly.GetTypes().Where(x => typeof(Controller).IsAssignableFrom(x)))
                 {
                     area = controller.GetTypeInfo().GetCustomAttribute<AreaAttribute>();
-                    sub = controller.GetTypeInfo().GetCustomAttribute<MenuTitleAttribute>();
 
                     if (area == null)
                         throw new MissingAttributeException($"Missing '{nameof(AreaAttribute)}' for controller {controller.FullName}");
 
-                    list.Add(new ControllerInfo(area.RouteValue, controller.Name.Replace("Controller", ""), sub?.Name));
+                    list.Add(new ControllerInfo(area.RouteValue, controller.Name.Replace("Controller", "")));
                 }
 
                 IModuleBase module = (IModuleBase)Activator.CreateInstance(moduleType, moduleAssembly);

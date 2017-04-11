@@ -18,15 +18,10 @@ namespace Core
         /// Controller class name (without 'Controller')
         /// </summary>
         public string controller;
-        /// <summary>
-        /// Controller title
-        /// </summary>
-        public string title;
 
-        public ControllerInfo(string area, string controller, string title)
+        public ControllerInfo(string area, string controller)
         {
             this.area = area;
-            this.title = title;
             this.controller = controller;
         }
     }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Core
 {
@@ -22,13 +23,13 @@ namespace Core
         /// </summary>
         string AreaName { get; }
         /// <summary>
-        /// Gets a title for main navigation panel of website.
-        /// </summary>
-        string MainTabTitle { get; }
-        /// <summary>
         /// Gets or sets a list of controllers to generate titles of submenu for navigation panel.
         /// </summary>
         IEnumerable<ControllerInfo> Controllers { get; set; }
+        /// <summary>
+        /// Gets or sets a list of features
+        /// </summary>
+        IFeatureCollection Features { get; set; }
         /// <summary>
         /// Add module services to the container.
         /// </summary>

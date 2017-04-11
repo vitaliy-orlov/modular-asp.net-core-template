@@ -5,7 +5,6 @@ using Core;
 namespace Module.Account.Controllers
 {
     [Area(ModuleInfo.AREA_NAME)]
-    [MenuTitle("Profile")]
     public class HomeController : Controller
     {
         public IActionResult Index()

@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Core
+@using Core.Features
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -34,19 +37,29 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
 
-                    @foreach (var module in Core.CoreMvcBuilderExtensions.ModulesList)
+                    @foreach (var panel in CoreMvcBuilderExtensions.ModulesList.Where(x => x.Features.Get<ISideBarPanelFeature>() != null).Select(x => x.Features.Get<ISideBarPanelFeature>()))
                     {
-                        <li role="presentation" class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                @module.MainTabTitle <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                @foreach (var item in module.Controllers)
-                                {
-                                    <li><a href="@Url.Action("Index", item.controller, new { Area = item.area })">@item.title</a></li>
-                                }
-                            </ul>
-                        </li>
+                        @if (panel.SubMenu?.Count > 0)
+                        {
+                            <li id="@panel.Id" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#@panel.Id" role="button" aria-haspopup="true" aria-expanded="false">
+                                    @panel.Title
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @foreach (var sub in panel.SubMenu)
+                                    {
+                                        <li id="@sub.Id-sub"><a asp-action="@sub.Action" asp-controller="@sub.Controller" asp-area="@sub.Area">@sub.Title</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a class="nav-link" href="@panel.Url"><i class="fa @panel.FAIcon"></i>@panel.Title</a>
+                            </li>
+                        }
                     }
                 </ul>
             </div>
