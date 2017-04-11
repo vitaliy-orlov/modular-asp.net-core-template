@@ -138,10 +138,10 @@ When you create a new module, it is necessary to observe the following rules:
 * The module should be dependent on the project *Core*
 * The module must implement the interface *IModuleBase*
 * Each controller must have the attribute *Area* with the same value
-* To specify the name of the controller to display the name on the navigation bar, use the *Features* property.
+* To specify the name of the controller to display the name on the navigation bar, use the *Features* property
 * The attribute value *Area* and the last word in the name of the project should be the same. For example, if your module is called *Product*, then each controller must have *Area* with a value of *Product*. If your project is called *My.Modular.App.Module.Product*, the *Area* should be set to *Product*
 * The module must have a constructor that takes a single parameter of type Assembly
-* The file ***.csprof** must have the following entry: ```<ItemGroup><EmbeddedResource Include="Views\**;wwwroot\**" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" /></ItemGroup>```
+* The file ***.csproj** must have the following entry: ```<ItemGroup><EmbeddedResource Include="Views\**;wwwroot\**" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" /></ItemGroup>```
 
 ### StaticResourcePathConverterTagHelper 
 
